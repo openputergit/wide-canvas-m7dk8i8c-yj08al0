@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepFake Detection System</title>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-900 via-purple-900 to-pink-900 min-h-screen">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const App = () => {
+            const [currentPage, setCurrentPage] = React.useState('login');
+            const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+            const [selectedFile, setSelectedFile] = React.useState(null);
+            const [result, setResult] = React.useState(null);
+            const [previewUrl, setPreviewUrl] = React.useState(null);
+
+            const handleFileChange = (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    setSelectedFile(file);
+                    setPreviewUrl(URL.createObjectURL(file));
+                }
+            };
+
+            const handleDetection = () => {
+                // Simulating API call with random result
+                setTimeout(() => {
+                    const isReal = Math.random() >= 0.5;
+                    setResult({
+                        status: isReal ? 'REAL' : 'FAKE',
+                        confidence: (Math.random() * 20 + 80).toFixed(2)
+                    });
+                }, 2000);
+            };
+
+            const LoginForm = () => (
+                <div className="glassmorphism rounded-xl p-8 w-full max-w-md mx-auto space-y-6">
+                    <h2 className="text-3xl font-bold text-white text-center mb-8">Login</h2>
+                    <input type="email" placeholder="Email" className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50" />
+                    <input type="password" placeholder="Password" className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50" />
+                    <button onClick={() => setIsAuthenticated(true)} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition">Login</button>
+                    <p className="text-white text-center">
+                        Don't have an account? 
+                        <button onClick={() => setCurrentPage('signup')} className="text-blue-300 ml-2 hover:underline">Sign Up</button>
+                    </p>
+                </div>
+            );
+
+            const SignupForm = () => (
+                <div className="glassmorphism rounded-xl p-8 w-full max-w-md mx-auto space-y-6">
+                    <h2 className="text-3xl font-bold text-white text-center mb-8">Sign Up</h2>
+                    <input type="text" placeholder="Full Name" className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50" />
+                    <input type="email" placeholder="Email" className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50" />
+                    <input type="password" placeholder="Password" className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50" />
+                    <input type="password" placeholder="Confirm Password" className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50" />
+                    <button onClick={() => setCurrentPage('login')} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition">Create Account</button>
+                    <p className="text-white text-center">
+                        Already have an account? 
+                        <button onClick={() => setCurrentPage('login')} className="text-blue-300 ml-2 hover:underline">Login</button>
+                    </p>
+                </div>
+            );
+
+            const DetectionPanel = () => (
+                <div className="glassmorphism rounded-xl p-8 w-full max-w-4xl mx-auto">
+                    <div className="flex justify-between items-center mb-8">
+                        <h2 className="text-3xl font-bold text-white">DeepFake Detection</h2>
+                        <button onClick={() => setIsAuthenticated(false)} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition">
+                            Logout
+                        </button>
+                    </div>
+                    
+                    <div className="space-y-6">
+                        <div className="border-2 border-dashed border-white/30 rounded-lg p-8 text-center">
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileChange}
+                                className="hidden"
+                                id="fileInput"
+                            />
+                            <label htmlFor="fileInput" className="cursor-pointer">
+                                <div className="text-white space-y-4">
+                                    <i className="bi bi-cloud-upload text-5xl"></i>
+                                    <p>Drag and drop your image here or click to browse</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        {previewUrl && (
+                            <div className="space-y-4">
+                                <div className="relative w-full h-64 rounded-lg overflow-hidden">
+                                    <img src={previewUrl} alt="Preview" className="absolute inset-0 w-full h-full object-contain" />
+                                </div>
+                                <button
+                                    onClick={handleDetection}
+                                    className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition"
+                                >
+                                    Analyze Image
+                                </button>
+                            </div>
+                        )}
+
+                        {result && (
+                            <div className={`p-4 rounded-lg text-center ${result.status === 'REAL' ? 'bg-green-600/20' : 'bg-red-600/20'}`}>
+                                <h3 className="text-2xl font-bold text-white mb-2">Result: {result.status}</h3>
+                                <p className="text-white/80">Confidence: {result.confidence}%</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="container mx-auto px-4 py-12">
+                    {!isAuthenticated ? (
+                        currentPage === 'login' ? <LoginForm /> : <SignupForm />
+                    ) : (
+                        <DetectionPanel />
+                    )}
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
